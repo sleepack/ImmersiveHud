@@ -19,6 +19,7 @@ namespace ImmersiveHud
         public static float playerCurrentFoodValue;
         public static float playerFoodPercentage;
         public static int playerHungerCount;
+        public static float playerEarliestFoodPercentage;
 
         // Character States
         public static bool characterEquippedItem;

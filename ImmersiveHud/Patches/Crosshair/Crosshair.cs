@@ -107,7 +107,30 @@ namespace ImmersiveHud
             if (File.Exists(filePath))
             {
                 Texture2D texture = new Texture2D(0, 0);
-                ImageConversion.LoadImage(texture, File.ReadAllBytes(filePath));
+                byte[] bytes = File.ReadAllBytes(filePath);
+                // Try calling Texture2D.LoadImage via reflection first (avoids compile-time dependency)
+                var loadMethod = typeof(Texture2D).GetMethod("LoadImage", new[] { typeof(byte[]) });
+                if (loadMethod != null)
+                {
+                    loadMethod.Invoke(texture, new object[] { bytes });
+                }
+                else
+                {
+                    // Fallback: try UnityEngine.ImageConversion.LoadImage via reflection (module may be present at runtime)
+                    var icType = System.Type.GetType("UnityEngine.ImageConversion, UnityEngine.ImageConversionModule");
+                    if (icType != null)
+                    {
+                        var staticLoad = icType.GetMethod("LoadImage", new[] { typeof(Texture2D), typeof(byte[]) });
+                        if (staticLoad != null)
+                            staticLoad.Invoke(null, new object[] { texture, bytes });
+                        else
+                            Debug.Log("ImmersiveHud: No suitable ImageConversion.LoadImage method found.");
+                    }
+                    else
+                    {
+                        Debug.Log("ImmersiveHud: Unable to load crosshair image - ImageConversion module not available.");
+                    }
+                }
 
                 return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
             }

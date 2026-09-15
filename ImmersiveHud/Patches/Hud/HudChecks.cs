@@ -144,10 +144,11 @@ namespace ImmersiveHud
             {
                 hudElements[nameHealthbar].ShowHudForDuration();
             }
-            else if (
+                else if (
                     // Display health panel when below a given percentage
                     (displayHealthWhenBelow.Value && player.GetHealthPercentage() <= healthPercentage.Value) ||
-                    (displayHealthWhenFoodBelow.Value && playerFoodPercentage <= foodPercentage.Value) ||
+                    (displayHealthWhenFoodBelow.Value && (playerFoodPercentage <= foodPercentage.Value || playerEarliestFoodPercentage <= foodPercentage.Value)) ||
+                    // Show health when hungry (only if hunger count meets threshold)
                     (displayHealthWhenHungry.Value && playerHungerCount >= foodHungerAmount.Value)
                     )
             {

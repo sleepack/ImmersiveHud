@@ -15,7 +15,7 @@ namespace ImmersiveHud
                 if (!isEnabled.Value)
                     return;
 
-                Transform hudRoot = __instance.transform.Find("hudroot");
+                Transform hudRoot = FindHudRoot(__instance.transform);
                 hudElements = new Dictionary<string, HudElement>();
 
                 HudElementAddCanvasGroup(hudRoot);

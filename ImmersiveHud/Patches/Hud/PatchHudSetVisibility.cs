@@ -17,7 +17,7 @@ namespace ImmersiveHud
                 if (!isEnabled.Value || !player || !__instance)
                     return;
 
-                Transform hudRoot = __instance.transform.Find("hudroot");
+                Transform hudRoot = FindHudRoot(__instance.transform);
 
                 GetPlayerState(hudRoot, player);
                 setCompatibility(hudRoot);

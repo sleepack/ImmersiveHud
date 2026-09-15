@@ -11,7 +11,7 @@ namespace ImmersiveHud
         {
             private static void Postfix(Hud __instance)
             {
-                Transform hudRoot = __instance.transform.Find("hudroot");
+                Transform hudRoot = FindHudRoot(__instance.transform);
 
                 DebugListOfMissingElements(hudRoot, Input.GetKeyDown(compatibilityIdHotkey.Value.MainKey));
                 DebugListOfHudElements(hudRoot, Input.GetKeyDown(listAllElementsHotkey.Value.MainKey));

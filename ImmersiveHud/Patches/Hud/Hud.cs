@@ -54,6 +54,7 @@ namespace ImmersiveHud
         public static void GetPlayerTotalFoodValue(Player player)
         {
             playerTotalFoodValue = playerCurrentFoodValue = playerHungerCount = 0;
+            playerEarliestFoodPercentage = 1f;
 
             foreach (Player.Food food in player.GetFoods())
             {
@@ -62,9 +63,23 @@ namespace ImmersiveHud
 
                 if (food.CanEatAgain())
                     playerHungerCount++;
+
+                // Track the earliest (smallest) remaining percentage of any food buff
+                if (food.m_item != null && food.m_item.m_shared != null && food.m_item.m_shared.m_food > 0f)
+                {
+                    float remaining = food.m_health / food.m_item.m_shared.m_food;
+                    if (remaining < playerEarliestFoodPercentage)
+                        playerEarliestFoodPercentage = remaining;
+                }
             }
 
-            playerFoodPercentage = playerCurrentFoodValue / playerTotalFoodValue;
+            if (playerTotalFoodValue > 0f)
+                playerFoodPercentage = playerCurrentFoodValue / playerTotalFoodValue;
+            else
+                playerFoodPercentage = 0f;
+
+            if (playerEarliestFoodPercentage < 0f || playerEarliestFoodPercentage > 1f)
+                playerEarliestFoodPercentage = 0f;
         }
 
         public static void HudSetValues(bool pressedHideKey, bool pressedShowKey)
@@ -212,6 +227,31 @@ namespace ImmersiveHud
                 }
                 Debug.Log("-------------------------------------------");
             }
+        }
+        
+        public static Transform FindHudRoot(Transform root)
+        {
+            if (root == null)
+                return null;
+
+            // Try exact match first
+            Transform t = root.Find("hudroot");
+            if (t != null)
+                return t;
+
+            // Fallback: search children for likely hud root names (case-insensitive)
+            foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
+            {
+                if (child == null || string.IsNullOrEmpty(child.name))
+                    continue;
+
+                string name = child.name.ToLower();
+                if (name.Contains("hudroot") || name.Contains("hud") || name.Contains("hud_root"))
+                    return child;
+            }
+
+            // As a last resort return the provided root
+            return root;
         }
     }
 }
